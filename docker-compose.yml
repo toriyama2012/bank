@@ -1,0 +1,44 @@
+version: "3.7"
+
+services:
+  mysql-db:
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=bank
+      - MYSQL_ROOT_PASSWORD=
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    ports:
+      - 3306:3306
+    volumes:
+      - ./data/schemas:/var/lib/mysql
+    networks:
+      bank_net:
+          ipv4_address: 174.21.0.9
+
+  bank:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8200:80
+    volumes:
+      - ./:/var/www
+      - ./public/:/var/www/html
+    networks:
+      bank_net:
+        ipv4_address: 174.21.0.10
+    depends_on:
+      - mysql-db
+
+volumes:
+  mysql:
+
+networks:
+  bank_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 174.21.0.0/24
